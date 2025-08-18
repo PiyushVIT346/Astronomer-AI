@@ -1,16 +1,94 @@
-# 🌌 Astronomer-AI  
+# 🌌 AI-Powered Zodiac Consultation System  
 
-Astronomer-AI is an intelligent astrology application that takes a user’s **birth details (Name, Date, Time, Place)** and provides personalized horoscope insights. It uses a combination of **rule-based zodiac calculation**, **RAG (Retrieval-Augmented Generation)** with document knowledge, and **Gemini AI API** for generating detailed astrological responses.  
+This project is an **AI-based astrologer consultation web application** that combines **rule-based zodiac sign calculation** with a **Retrieval-Augmented Generation (RAG) system** powered by **Google Gemini (Generative AI)**. The goal is to provide personalized horoscope advice to users based on their birth details.  
 
 ---
 
-## ✨ Features  
-- Collects user input: **Name, Date of Birth, Time, and Location**  
-- Determines the **zodiac sign** from birth details  
-- Uses `zodiac_horoscope.csv` for horoscope mapping  
-- Enhances responses with **RAG from `zodiac_info.docx`**  
-- Allows free-text user questions about astrology  
-- Provides AI-generated astrology-based insights  
+## 🚀 Project Overview  
+
+### 🔹 User Registration  
+- The user provides their **Name** and **Birth Details** (Date of Birth, Time, Location – currently only Date is required).  
+- The system automatically determines their **Zodiac Sign** based on the birth date.  
+
+### 🔹 Zodiac Knowledge Base (RAG System)  
+- A knowledge base is built from a document (`zodiac_info.docx`) containing detailed information about each zodiac sign.  
+- This document is split into chunks and embedded into a **FAISS vector database** using **Google Generative AI embeddings**.  
+- The RAG system retrieves the most relevant zodiac information when answering user queries.  
+
+### 🔹 Consultation (Q&A)  
+- The user can ask **free-text questions** like:  
+  - *"What does my zodiac say about career growth?"*  
+  - *"How will my relationships be this year?"*  
+- The system enhances the query with the user's **zodiac sign** and retrieves relevant content.  
+- **Gemini LLM** generates a **personalized, context-aware response**.  
+
+### 🔹 Web Interface & API  
+- A **Flask application** exposes REST APIs:  
+  - `/register` → Register a user with name + DOB.  
+  - `/ask` → Ask questions and get zodiac-based responses.  
+  - `/profile` → Retrieve the current user’s profile info.  
+- A basic **chat UI** (`index.html`) is included.  
+- Responses are formatted with **Markdown** for better readability.  
+
+---
+
+## ⚙️ Core Components  
+
+### 1. **User Profile Management**  
+- Defined using a Python `dataclass` (`UserProfile`).  
+- Stores:  
+  - Name  
+  - Birth Date  
+  - Zodiac Sign  
+
+### 2. **Zodiac Date Manager**  
+- Reads **`zodiac_horoscope.csv`**, which contains zodiac date ranges.  
+- Based on the user’s birth date, it calculates their **zodiac sign**.  
+- Handles **year-crossing ranges** like Capricorn *(Dec 22 – Jan 19)*.  
+
+### 3. **RAG System (Retrieval-Augmented Generation)**  
+- **Embeddings**: Uses `GoogleGenerativeAIEmbeddings` (`models/embedding-001`).  
+- **Vector Database**: FAISS is used to store and query chunks of `zodiac_info.docx`.  
+- **LLM**: `ChatGoogleGenerativeAI` (Gemini 2.0 Flash Lite) for generating answers.  
+- **Workflow**:  
+  1. Load `zodiac_info.docx` → split into chunks.  
+  2. Store chunks in FAISS with embeddings.  
+  3. Retrieve relevant chunks per user question.  
+  4. Use Gemini LLM to generate a **personalized zodiac-based answer**.  
+
+### 4. **Consultation App Wrapper**  
+- Orchestrates everything:  
+  - Registers users and determines their **zodiac sign**.  
+  - Creates a **retriever** for the specific zodiac sign.  
+  - Handles **user questions and responses**.  
+  - Stores the **current user session**.  
+
+### 5. **Flask API Endpoints**  
+- `/` → Loads chat UI (`index.html`).  
+- `/register` (POST) → Register user with name + DOB → Returns zodiac sign.  
+- `/ask` (POST) → Accepts a question → Returns Gemini + RAG-generated answer.  
+- `/profile` (GET) → Returns current user’s profile info (name, DOB, zodiac sign).  
+
+---
+
+## 📂 File Dependencies  
+
+- **`zodiac_horoscope.csv`** → Contains zodiac sign date ranges *(Date begin, Date end, Zodiac)*.  
+- **`zodiac_info.docx`** → Contains detailed zodiac descriptions *(Personality, Love, Career, etc.)*.  
+- **`index.html`** → Basic frontend for chat interaction.  
+
+---
+
+## 🛠️ Tech Stack  
+
+- **Backend**: Flask  
+- **AI Models**: Google Gemini (`ChatGoogleGenerativeAI`, `GoogleGenerativeAIEmbeddings`)  
+- **Vector Store**: FAISS  
+- **Document Processing**: Docx2txtLoader, LangChain Text Splitter  
+- **Frontend**: HTML (chat UI)  
+- **Data**: Zodiac CSV + Horoscope DOCX  
+
+---
 
 ---
 
