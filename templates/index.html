@@ -1,0 +1,401 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Zodiac Consultation Chatbot 🌌</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <style>
+    body {
+      background: linear-gradient(135deg, #1a1a2e 0%, #16213e 25%, #0f3460 50%, #533483 75%, #8b5a2b 100%);
+      color: #fff;
+      font-family: 'Arial', sans-serif;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      position: relative;
+      overflow-x: hidden;
+    }
+    
+    /* Starfield background animation */
+    body::before {
+      content: '';
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-image: 
+        radial-gradient(2px 2px at 20px 30px, #ffd700, transparent),
+        radial-gradient(2px 2px at 40px 70px, #ffef94, transparent),
+        radial-gradient(1px 1px at 90px 40px, #fff8dc, transparent),
+        radial-gradient(1px 1px at 130px 80px, #ffd700, transparent),
+        radial-gradient(2px 2px at 160px 30px, #ffef94, transparent);
+      background-repeat: repeat;
+      background-size: 200px 100px;
+      animation: sparkle 3s linear infinite;
+      opacity: 0.6;
+      z-index: -1;
+    }
+    
+    @keyframes sparkle {
+      from { transform: translateY(0px); }
+      to { transform: translateY(-100px); }
+    }
+    
+    .chat-container {
+      background: linear-gradient(145deg, rgba(255, 215, 0, 0.1), rgba(255, 239, 148, 0.05));
+      backdrop-filter: blur(10px);
+      border: 2px solid rgba(255, 215, 0, 0.3);
+      border-radius: 20px;
+      padding: 30px;
+      margin-top: 30px;
+      max-width: 900px;
+      margin-left: auto;
+      margin-right: auto;
+      box-shadow: 
+        0 8px 32px rgba(255, 215, 0, 0.1),
+        inset 0 1px 0 rgba(255, 255, 255, 0.1);
+      position: relative;
+    }
+    
+    /* Rotating cusp/crescent moon on the right side */
+    .chat-container::after {
+      content: '☽';
+      position: absolute;
+      right: -20px;
+      top: 50%;
+      transform: translateY(-50%);
+      font-size: 60px;
+      color: #ffd700;
+      animation: rotate 8s linear infinite;
+      text-shadow: 0 0 20px rgba(255, 215, 0, 0.8);
+      z-index: 10;
+    }
+    
+    @keyframes rotate {
+      from { transform: translateY(-50%) rotate(0deg); }
+      to { transform: translateY(-50%) rotate(360deg); }
+    }
+    
+    .chat-bubble {
+      padding: 15px 20px;
+      border-radius: 15px;
+      margin-bottom: 15px;
+      position: relative;
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+    }
+    
+    .user-bubble {
+      background: linear-gradient(135deg, #ffd700, #ffb347);
+      color: #1a1a2e;
+      text-align: right;
+      margin-left: 60px;
+      border-bottom-right-radius: 5px;
+    }
+    
+    .user-bubble::before {
+      content: '⭐';
+      position: absolute;
+      right: -15px;
+      bottom: 5px;
+      font-size: 20px;
+    }
+    
+    .bot-bubble {
+      background: linear-gradient(135deg, #4a4a4a, #2d2d2d);
+      color: #ffd700;
+      border: 1px solid rgba(255, 215, 0, 0.3);
+      margin-right: 60px;
+      border-bottom-left-radius: 5px;
+      position: relative;
+    }
+    
+    .bot-bubble::before {
+      content: '🔮';
+      position: absolute;
+      left: -15px;
+      bottom: 5px;
+      font-size: 20px;
+    }
+    
+    .chat-box {
+      max-height: 400px;
+      overflow-y: auto;
+      margin-bottom: 25px;
+      padding: 10px;
+      border-radius: 15px;
+      background: rgba(0, 0, 0, 0.2);
+    }
+    
+    /* Custom scrollbar */
+    .chat-box::-webkit-scrollbar {
+      width: 8px;
+    }
+    
+    .chat-box::-webkit-scrollbar-track {
+      background: rgba(255, 215, 0, 0.1);
+      border-radius: 10px;
+    }
+    
+    .chat-box::-webkit-scrollbar-thumb {
+      background: linear-gradient(180deg, #ffd700, #ffb347);
+      border-radius: 10px;
+    }
+    
+    h1 {
+      text-align: center;
+      background: linear-gradient(45deg, #ffd700, #fff8dc, #ffd700);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      font-size: 2.5rem;
+      font-weight: bold;
+      text-shadow: 0 0 30px rgba(255, 215, 0, 0.5);
+      margin-bottom: 10px;
+    }
+    
+    .subtitle {
+      text-align: center;
+      color: #ffef94;
+      font-size: 1.1rem;
+      margin-bottom: 30px;
+      text-shadow: 0 0 10px rgba(255, 239, 148, 0.3);
+    }
+    
+    .form-control {
+      background: rgba(255, 215, 0, 0.1);
+      border: 2px solid rgba(255, 215, 0, 0.3);
+      border-radius: 12px;
+      color: #fff;
+      padding: 12px 15px;
+    }
+    
+    .form-control:focus {
+      background: rgba(255, 215, 0, 0.15);
+      border-color: #ffd700;
+      box-shadow: 0 0 15px rgba(255, 215, 0, 0.3);
+      color: #fff;
+    }
+    
+    .form-control::placeholder {
+      color: rgba(255, 239, 148, 0.7);
+    }
+    
+    .form-label {
+      color: #ffd700;
+      font-weight: bold;
+      margin-bottom: 8px;
+    }
+    
+    .btn-primary {
+      background: linear-gradient(135deg, #ffd700, #ffb347);
+      border: none;
+      border-radius: 12px;
+      color: #1a1a2e;
+      font-weight: bold;
+      padding: 12px 30px;
+      transition: all 0.3s ease;
+      box-shadow: 0 4px 15px rgba(255, 215, 0, 0.3);
+    }
+    
+    .btn-primary:hover {
+      background: linear-gradient(135deg, #ffb347, #ffd700);
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(255, 215, 0, 0.4);
+    }
+    
+    .btn-success {
+      background: linear-gradient(135deg, #32cd32, #228b22);
+      border: none;
+      border-radius: 12px;
+      color: white;
+      font-weight: bold;
+      padding: 12px 25px;
+      transition: all 0.3s ease;
+      box-shadow: 0 4px 15px rgba(50, 205, 50, 0.3);
+    }
+    
+    .btn-success:hover {
+      background: linear-gradient(135deg, #228b22, #32cd32);
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(50, 205, 50, 0.4);
+    }
+    
+    .alert-success {
+      background: linear-gradient(135deg, rgba(255, 215, 0, 0.2), rgba(50, 205, 50, 0.2));
+      border: 2px solid rgba(255, 215, 0, 0.5);
+      color: #ffd700;
+      border-radius: 12px;
+    }
+    
+    .alert-danger {
+      background: linear-gradient(135deg, rgba(255, 69, 69, 0.2), rgba(220, 20, 60, 0.2));
+      border: 2px solid rgba(255, 69, 69, 0.5);
+      color: #ff6b6b;
+      border-radius: 12px;
+    }
+    
+    h4 {
+      color: #ffd700;
+      text-shadow: 0 0 10px rgba(255, 215, 0, 0.3);
+      margin-bottom: 20px;
+    }
+    
+    /* Floating cosmic particles */
+    .cosmic-particle {
+      position: absolute;
+      width: 4px;
+      height: 4px;
+      background: #ffd700;
+      border-radius: 50%;
+      animation: float 6s ease-in-out infinite;
+      opacity: 0.7;
+    }
+    
+    @keyframes float {
+      0%, 100% { transform: translateY(0px) rotate(0deg); }
+      50% { transform: translateY(-20px) rotate(180deg); }
+    }
+    
+    /* Responsive design */
+    @media (max-width: 768px) {
+      .chat-container {
+        margin: 15px;
+        padding: 20px;
+      }
+      
+      .chat-container::after {
+        font-size: 40px;
+        right: -15px;
+      }
+      
+      h1 {
+        font-size: 2rem;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container py-4">
+    <h1>🔮 Zodiac Consultation Chatbot</h1>
+    <p class="subtitle">Get personalized advice from the stars ✨</p>
+
+    <!-- Floating cosmic particles -->
+    <div class="cosmic-particle" style="top: 20%; left: 10%; animation-delay: 0s;"></div>
+    <div class="cosmic-particle" style="top: 60%; left: 85%; animation-delay: 2s;"></div>
+    <div class="cosmic-particle" style="top: 80%; left: 20%; animation-delay: 4s;"></div>
+
+    <!-- Registration Form -->
+    <div class="chat-container" id="registerSection">
+      <h4>✨ Register with the Cosmos</h4>
+      <form id="registerForm">
+        <div class="mb-3">
+          <label for="name" class="form-label">🌟 Your Name (optional)</label>
+          <input type="text" id="name" class="form-control" placeholder="Enter your celestial name...">
+        </div>
+        <div class="mb-3">
+          <label for="birthdate" class="form-label">🎂 Birth Date</label>
+          <input type="date" id="birthdate" class="form-control" required>
+        </div>
+        <button type="submit" class="btn btn-primary">🚀 Register with the Stars</button>
+      </form>
+      <div id="registerStatus" class="mt-3"></div>
+    </div>
+
+    <!-- Chat Section -->
+    <div class="chat-container d-none" id="chatSection">
+      <h4>🌌 Ask the Cosmic Oracle</h4>
+      <div class="chat-box" id="chatBox"></div>
+      <form id="questionForm" class="d-flex">
+        <input type="text" id="question" placeholder="What do the stars want to tell you...?" class="form-control me-2" required>
+        <button type="submit" class="btn btn-success"> Ask</button>
+      </form>
+    </div>
+  </div>
+
+  <script>
+    const registerForm = document.getElementById("registerForm");
+    const registerStatus = document.getElementById("registerStatus");
+    const chatSection = document.getElementById("chatSection");
+    const chatBox = document.getElementById("chatBox");
+    const questionForm = document.getElementById("questionForm");
+
+    let registered = false;
+
+    // Flask Backend Base URL
+    const BASE_URL = "http://127.0.0.1:5000";
+
+    // Handle Registration
+    registerForm.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const name = document.getElementById("name").value;
+      const birthdate = document.getElementById("birthdate").value;
+
+      registerStatus.innerHTML = "⏳ Connecting to the cosmic network...";
+
+      try {
+        const res = await fetch(`${BASE_URL}/register`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ name: name, birth_date: birthdate }),
+        });
+        const data = await res.json();
+
+        if (res.ok) {
+          registerStatus.innerHTML = `<div class="alert alert-success"> ${data.message} Your zodiac sign is <b>${data.zodiac_sign}</b>. 🌟</div>`;
+          registered = true;
+          chatSection.classList.remove("d-none");
+        } else {
+          registerStatus.innerHTML = `<div class="alert alert-danger">❌ ${data.error}</div>`;
+        }
+      } catch (err) {
+        registerStatus.innerHTML = `<div class="alert alert-danger">❌ Cosmic interference detected: ${err}</div>`;
+      }
+    });
+
+    // Handle Asking Questions
+    questionForm.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const questionInput = document.getElementById("question");
+      const question = questionInput.value.trim();
+
+      if (!question || !registered) return;
+
+      // Show user question in chat
+      chatBox.innerHTML += `<div class="chat-bubble user-bubble"><b>You:</b> ${question}</div>`;
+      chatBox.scrollTop = chatBox.scrollHeight;
+      questionInput.value = "";
+
+      // Show typing indicator
+      chatBox.innerHTML += `<div class="chat-bubble bot-bubble" id="typing"><b>Cosmic Oracle:</b> <i>Consulting the stars... ✨</i></div>`;
+      chatBox.scrollTop = chatBox.scrollHeight;
+
+      // Call backend API
+      try {
+        const res = await fetch(`${BASE_URL}/ask`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ question }),
+        });
+        const data = await res.json();
+
+        // Remove typing indicator
+        document.getElementById("typing").remove();
+
+        if (res.ok) {
+          chatBox.innerHTML += `<div class="chat-bubble bot-bubble"><b>🌟 Cosmic Advice for ${data.zodiac_sign}:</b><br>${data.answer}</div>`;
+        } else {
+          chatBox.innerHTML += `<div class="chat-bubble bot-bubble"><b>❌ Cosmic Error:</b> ${data.error}</div>`;
+        }
+        chatBox.scrollTop = chatBox.scrollHeight;
+      } catch (err) {
+        // Remove typing indicator
+        document.getElementById("typing")?.remove();
+        chatBox.innerHTML += `<div class="chat-bubble bot-bubble"><b>❌ Cosmic Interference:</b> ${err}</div>`;
+        chatBox.scrollTop = chatBox.scrollHeight;
+      }
+    });
+  </script>
+</body>
+</html>
