@@ -1,3 +1,6 @@
+![Uploading image.png…]()
+
+
 # 🌌 AI-Powered Zodiac Consultation System  
 
 This project is an **AI-based astrologer consultation web application** that combines **rule-based zodiac sign calculation** with a **Retrieval-Augmented Generation (RAG) system** powered by **Google Gemini (Generative AI)**. The goal is to provide personalized horoscope advice to users based on their birth details.  
