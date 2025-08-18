@@ -29,14 +29,29 @@ Astronomer-AI/
 ```
 ## ⚙️ Installation & Setup  
 
-### 1. Clone the repository  
+### Clone the repository  
 ```bash
 git clone https://github.com/PiyushVIT346/Astronomer-AI.git
 cd Astronomer-AI
 ```
-🚀 Running the Project
+## 🚀 Running the Project
+## Step 1: Create dataset for containing information of month of birth and respective zodic symbol. 
 
-Run the main app:
+for that Run create_zodic.py
+```bash
+python create_zodic.py
+```
+created a new zodic_horoscope.csv file
+
+## Step 2: Now Scrap the website containing all information related to that zodic sign and human's Personality Traits(likes,dislikes,weakness),Love, Sex & Compatibility,Friends and Family,Career and Money,A Lover's Guide(for both man and woman) and other information.
+
+for that Run horo.py
+```bash
+python horo.py
+```
+created a docs file containing all zodic sign insights.
+
+Run the main app: (flask app)
 ```bash
 python app.py
 ```
