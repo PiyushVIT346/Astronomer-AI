@@ -26,23 +26,24 @@ Astronomer-AI/
 ├── zodiac_info.docx      # Knowledge base with zodiac details
 ├── requirements.txt      # Python dependencies
 └── README.md             # Project documentation
-
+```
 ## ⚙️ Installation & Setup  
 
 ### 1. Clone the repository  
 ```bash
 git clone https://github.com/PiyushVIT346/Astronomer-AI.git
 cd Astronomer-AI
-
+```
 🚀 Running the Project
 
 Run the main app:
-
+```bash
 python app.py
-
+```
 
 The app will start a local web server (Flask/FastAPI based).
 
 Open your browser at:
-
+```bash
 http://127.0.0.1:5000
+```
