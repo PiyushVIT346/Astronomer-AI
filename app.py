@@ -161,16 +161,32 @@ class ZodiacRAGSystem:
         if not self.qa_chain:
             raise ValueError("QA chain not initialized. Call create_zodiac_specific_retriever() first.")
 
+        # Base enhanced query
         enhanced_question = f"""
         I am a {user_profile.zodiac_sign} zodiac horoscope. {question}
 
         Please provide advice specifically tailored to {user_profile.zodiac_sign} zodiac horoscope traits.
         """
 
+        # First retrieval attempt
         result = self.qa_chain.invoke({"query": enhanced_question})
 
+        # Check if result looks empty or irrelevant
+        if not result.get("result") or len(result.get("result").strip()) < 25:
+            print("⚠️ No strong response found. Retrying with enhanced query...")
+
+            # Retry prompt with stronger instruction
+            retry_question = f"""
+            Provide a detailed and helpful answer **only** for the zodiac sign: {user_profile.zodiac_sign}.
+            Original user query: "{question}"
+
+            If not in the documents, still infer advice based on {user_profile.zodiac_sign}'s general traits.
+            """
+
+            result = self.qa_chain.invoke({"query": retry_question})
+
         return {
-            "answer": result["result"],
+            "answer": result.get("result", "No relevant info found."),
             "zodiac_sign": user_profile.zodiac_sign,
             "source_documents": [doc.page_content for doc in result.get("source_documents", [])],
             "question": question
